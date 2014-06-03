@@ -1,0 +1,72 @@
+html{
+	background-color: #F9F4EC;
+	color: #FFF;
+}
+/*@font-face
+{
+	font-family: digitalFont;
+	src: DS-DIGI.TTF;
+}
+num{
+	font-family: digitalFont;
+}*/
+.container{
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 25px;
+	margin-bottom: 25px;
+	width: 95%;
+	font-family: sans-serif;
+	background-color: #A4D09F;
+}
+.banner{
+	display: inline-block center;
+	padding: 5% 10% 0% 10%;
+	width:80%;
+}
+.goal{
+	float: left;
+	margin: 0% 1% 0% 5%;
+	padding: 4% 2% 4% 2%;
+	width: 70%;
+	background-color: #A6C8A3;
+	border-radius: 3px;
+	text-align: center;
+}
+#total-minutes{
+	display: inline-block;
+	padding: 4% 5% 4% 5%;
+	background-color: #5B5852;
+	color: #D4B98C;
+	border-radius: 3px;
+}
+.panel{
+	display: inline-block center;
+	padding: 0% 5% 5% 15%;
+	width:80%;
+}
+.day{
+	display: inline-block; /*mobile: display: inline-block center;*/
+	width: 12%;
+	text-align: center;
+}
+.weekday{
+	border: 1px solid #95BA91;
+	border-radius: 3px;
+}
+.weekday .minute-counter{
+	display: inline-block;
+	margin: 10% 5% 10% 5%;
+	padding: 5% 15% 5% 15%;
+	border: 1px solid #95BA91;
+	border-radius: 3px;
+	background-color: #A6C8A3;
+}
+.slider{
+	background-color: #A6C8A3;
+}
+.name-of-day{
+	display: inline-block;
+}
+
+
