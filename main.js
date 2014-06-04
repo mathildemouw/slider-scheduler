@@ -1,110 +1,118 @@
-function Goal ( days ) {
-	this.days = days;
+function Goal () {
 	this.total = 0;
 }
 Goal.prototype = {
-	displayTotal: function () {
-		sum = 0;
-		for (var i = 0; i < this.days.length; i++) {
-			sum += this.days[ i ].count
-		};
-		this.total = sum;
+	updateTotal: function ( value ) {
+		this.total += value;
 		document.getElementById( 'total-minutes' ).innerHTML = "<num>" + this.total + "</num> min"
 	},
-	attachListeners: function () {
-		for (var i = 0; i < this.days.length; i++) {
-			this.days[ i ].binder.listenForToggling( this.toggling );
-		};
-	},
 }
-// each day ///
-function Day ( dayId ) {
-	this.canvas = document.getElementById( dayId ).getElementsByClassName( 'slider' )[ 0 ];
+
+function Day ( dayId, goal ) {
+	this.goal = goal;
+	this.dayElement = document.getElementById( dayId ).getElementsByClassName( 'slider' )[ 0 ];
+	this.stage = new Kinetic.Stage({
+			container: this.dayElement.id, 
+			width: 60,
+	    	height: 250
+			});
 	this.counter = document.getElementById( dayId ).getElementsByClassName( 'minute-counter' )[ 0 ];
 	this.count = 0;
-	this.binder = new DayBinder ( this.canvas );
-	this.toggling = false;
+	this.toggle = new Kinetic.Rect({
+			x: (this.stage.getWidth() / 2) - 20,
+			y: 210,
+			shadowColor: '#95BA91',
+			shadowOffsetX: 5,
+			shadowOffsetY: 5,
+			width: 40,
+			height: 15,
+			fill: '#FFF',
+			cornerRadius: 3,
+			draggable: true,
+			dragBoundFunc: function( pos ) {
+				return {
+					x: this.getAbsolutePosition().x,
+					y: pos.y
+					}
+				},
+			});
+	this.slider = new Kinetic.Rect({
+			x: (this.stage.getWidth() / 2) - 2.5,
+			y: 10,
+			width: 5,
+			height: 220,
+			fill: '#95BA91',
+			cornerRadius: 3,
+		});
+	new DayBinder ( this );
+
 }
 Day.prototype = {
 	render: function () {
-		this.drawSlider( 10, 220, "#95BA91" ); //210 in length, each 3 px = 1 min.
 		this.drawToggle();
 		this.displayCount();
 	},
-	drawSlider: function ( start, dist, fillColor ) {
-		context = this.canvas.getContext( "2d" );
-		context.fillStyle = fillColor;
-		context.fillRect( 27, start, 5, dist );
-	},
 	drawToggle: function () {
-		context = this.canvas.getContext( "2d" );
-		var centerX = 0;
-		var centerY = 100;
-		var radius = 8;
-		var toggledDist = 210;
-		var toggleStart = 220 ;
-		context.save();
-		context.translate(this.canvas.width / 2, this.canvas.height / 2);
-		context.scale(3, 1);
-		context.beginPath();
-		context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-		context.restore();
-		context.fillStyle = '#FFF';
-		context.fill();
-		this.drawSlider( toggleStart, (227- (toggledDist)),'#FFF');
+		var layer = new Kinetic.Layer();
+		layer.add( this.slider );
+		layer.add( this.toggle );
+		this.stage.add( layer );
 	},
 	displayCount: function () {
 		this.counter.innerHTML = "<num>"+ this.count + "</num> min";
 	},
-	adjustToggleHeight: function () {
-		if ( this.toggling ) {
-			this.getMousePositionY();
-		}
-	},
-	incrementCountByToggle: function () {},
-}
-function DayBinder ( canvas ) {
-	this.toggling = false;
-	this.canvas = canvas
-}
-DayBinder.prototype = {
-	listenForToggling: function ( flag ) {
-		today = this;
-		this.canvas.addEventListener( 'mousedown', today.bindDrag.bind( today ) );
-		this.canvas.addEventListener( 'mouseup', today.unbindDrag.bind( today ) );
-	},
-	bindDrag: function () {
-		this.canvas.addEventListener( 'mousemove', today.getMousePositionY);
-	},
-	unbindDrag: function () {
-		debugger
-		this.canvas.removeEventListener( 'mousemove');
-	},
-	getMousePositionY: function ( event ) {
-		var rect = this.getBoundingClientRect();
-		console.log(rect.top)
-		console.log(event.clienty);
-		// return {
-		// 	y: event.clienty - rect.top
-		// };
-	},
+
+	incrementCountByToggle: function ( toggleY ) {
+		var incremented = (Math.floor((230 - toggleY) / 14))*5
+		var oldCount = this.count
+		var difference = incremented - oldCount
+		this.count = incremented
+		this.displayCount();
+		this.goal.updateTotal( difference );
+	}
 }
 
-mon = new Day ( "mon" );
+function DayBinder ( controller ) {
+	this.toggleY = 210;
+	this.dayElement = controller.dayElement;
+	this.toggle = controller.toggle;
+	this.controller = controller;
+	var self = this
+
+	this.listenForToggling = function () {
+		this.toggle.addEventListener( 'mousedown', this.togglePositionY );
+		document.addEventListener( 'mouseup', this.unbindDrag );
+	}
+
+	this.calculateY = function (e) {
+			    var $div = $( "#"+ self.dayElement.id +"" );
+			    self.toggleY = e.pageY - $div.offset().top;
+			    self.controller.incrementCountByToggle( Math.floor( self.toggleY ) ); 
+	}
+
+	this.togglePositionY = function () {
+		$(document).mousemove( self.calculateY );
+	}
+
+	this.unbindDrag = function () {
+		$( document ).off( 'mousemove', self.calculateY );
+	}
+
+	this.listenForToggling()
+}
+
+goal = new Goal();
+mon = new Day ( "mon", goal );
 mon.render();
-tue = new Day ( "tue" );
+tue = new Day ( "tue", goal );
 tue.render();
-wed = new Day ( "wed" );
+wed = new Day ( "wed", goal );
 wed.render();
-thu = new Day ( "thu" );
+thu = new Day ( "thu", goal );
 thu.render();
-fri = new Day ( "fri" );
+fri = new Day ( "fri", goal );
 fri.render();
-sat = new Day ( "sat" );
+sat = new Day ( "sat", goal );
 sat.render();
-sun = new Day ( "sun" );
+sun = new Day ( "sun", goal );
 sun.render();
-goal = new Goal([mon, tue, wed, thu, fri, sat, sun]);
-goal.attachListeners();
-
-//UNBIND NOT WORKING OMIGOD
