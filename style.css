@@ -3,6 +3,7 @@ html{
 	color: #FFF;
 }
 .container{
+	max-width: 900px;
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 25px;
@@ -15,6 +16,7 @@ html{
 	display: inline-block center;
 	padding: 5% 10% 0% 10%;
 	width:80%;
+	font-size: 1.2em;
 }
 .goal{
 	float: left;
@@ -54,8 +56,24 @@ html{
 	border-radius: 3px;
 	background-color: #A6C8A3;
 }
-.slider{
+#name-of-day{
+	display: inline-block center;
+	font-size: 1.3em;
 }
-.name-of-day{
-	display: inline-block;
+@media screen and (max-width: 750px) {
+	.goal{
+		display: inline;
+	}
+	#total-minutes{
+		display: inline-block;
+		position: fixed;
+	}
+	.panel{
+		display: inline-block;
+		padding: 0 0 0 30%;
+		width: 40%
+	}
+	.day{
+		display: inline;
+	}
 }
